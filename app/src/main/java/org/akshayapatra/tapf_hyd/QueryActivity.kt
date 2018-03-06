@@ -23,9 +23,8 @@ class QueryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_query)
 
-        val companies = FirebaseDatabase.getInstance().getReference("/companies")
+        val companies = FirebaseDatabase.getInstance().getReference("/states")
         states = ArrayList()
-        states!!.add("All")
 
         statesAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, states);
 

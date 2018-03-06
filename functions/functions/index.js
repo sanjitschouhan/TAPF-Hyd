@@ -18,63 +18,68 @@ exports.clearDatabase = functions.https.onRequest(function (request, response) {
 
 });
 
-exports.generateDatabaseManually = functions.https.onRequest(function (request, response) {
-    response.send("Completed");
+function generateDB() {
     const filePath = "companies.csv";
     const bucket = gcs.bucket("gs://tapf-hyd.appspot.com");
     const companies = admin.database().ref("/companies");
+    const statesDB = admin.database().ref("/states");
     const tempFilePath = path.join(os.tmpdir(), filePath);
     var file = bucket.file(filePath);
     var states = [];
     return file.download({
-        destination: tempFilePath,
+        destination: tempFilePath
     }).then(function () {
         return csv()
             .fromFile(tempFilePath)
             .on("json", function (jsonObj) {
                 if (states.indexOf(jsonObj.REGISTERED_STATE) === -1) {
                     states.push(jsonObj.REGISTERED_STATE);
+                    statesDB.child(jsonObj.REGISTERED_STATE).set(true);
                     return companies.child(jsonObj.REGISTERED_STATE)
                         .remove()
                         .then(function () {
-                            companies
+                            return companies
                                 .child(jsonObj.REGISTERED_STATE)
                                 .child(jsonObj.CIN)
                                 .set(jsonObj);
-                            return "";
                         })
                 } else {
-                    companies
+                    return companies
                         .child(jsonObj.REGISTERED_STATE)
                         .child(jsonObj.CIN)
                         .set(jsonObj);
-                    return "";
                 }
             }).on("done", function (error) {
                 fs.unlinkSync(tempFilePath);
             });
     });
+}
+
+exports.generateDatabaseManually = functions.https.onRequest(function (request, response) {
+    response.send("Completed");
+    return generateDB();
 });
 
 exports.generateDatabase = functions.storage.object().onChange(function (event) {
-    const filePath = "companies.csv";
-    const bucket = gcs.bucket("gs://tapf-hyd.appspot.com");
-    const companies = admin.database().ref("/companies");
-    const tempFilePath = path.join(os.tmpdir(), filePath);
-    var file = bucket.file(filePath);
-    return file.download({
-        destination: tempFilePath,
-    }).then(function () {
-        return csv()
-            .fromFile(tempFilePath)
-            .on("json", function (jsonObj) {
-                companies
-                    .child(jsonObj.REGISTERED_STATE)
-                    .child(jsonObj.CIN)
-                    .set(jsonObj);
-                return "";
-            }).on("done", function (error) {
-                fs.unlinkSync(tempFilePath);
-            });
-    });
+    // const filePath = "companies.csv";
+    // const bucket = gcs.bucket("gs://tapf-hyd.appspot.com");
+    // const companies = admin.database().ref("/companies");
+    // const tempFilePath = path.join(os.tmpdir(), filePath);
+    // var file = bucket.file(filePath);
+    // return file.download({
+    //     destination: tempFilePath
+    // }).then(function () {
+    //     return csv()
+    //         .fromFile(tempFilePath)
+    //         .on("json", function (jsonObj) {
+    //             companies
+    //                 .child(jsonObj.REGISTERED_STATE)
+    //                 .child(jsonObj.CIN)
+    //                 .set(jsonObj);
+    //             return "";
+    //         }).on("done", function (error) {
+    //             fs.unlinkSync(tempFilePath);
+    //         });
+    // });
+    return generateDB()
 });

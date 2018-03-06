@@ -1,5 +1,6 @@
 package org.akshayapatra.tapf_hyd
 
+import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -18,10 +19,15 @@ import com.google.firebase.database.FirebaseDatabase
 
 class LoginActivity : AppCompatActivity() {
     private var mAuth: FirebaseAuth? = null
+    private var progressDialog: ProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
+        progressDialog = ProgressDialog(this)
+        progressDialog?.setTitle("Loading")
+        progressDialog?.isIndeterminate = true
 
         mAuth = FirebaseAuth.getInstance()
     }
@@ -33,6 +39,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun updateUI(currentUser: FirebaseUser?) {
+
         if (currentUser != null) {
             if (currentUser.displayName.isNullOrBlank()) {
                 val builder = AlertDialog.Builder(this)
@@ -44,6 +51,7 @@ class LoginActivity : AppCompatActivity() {
                 builder.setView(input)
 
                 builder.setPositiveButton("OK", DialogInterface.OnClickListener { dialog, which ->
+                    progressDialog?.show()
                     val name = input.text.toString()
                     val database = FirebaseDatabase.getInstance()
                     val users = database.getReference("users")
@@ -56,6 +64,7 @@ class LoginActivity : AppCompatActivity() {
                                         .addOnCompleteListener {
                                             startActivity(Intent(this, QueryActivity::class.java))
                                         }
+                                progressDialog?.hide()
                             }
                 })
                 builder.setCancelable(false);
@@ -68,6 +77,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun login(view: View) {
+        progressDialog?.show()
         val emailTextView: TextView = findViewById(R.id.email)
         val email = emailTextView.text.toString()
         val passwordTextView: TextView = findViewById(R.id.password)
@@ -81,6 +91,7 @@ class LoginActivity : AppCompatActivity() {
                         Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
                         updateUI(null)
                     }
+                    progressDialog?.hide()
                 }
     }
 }
