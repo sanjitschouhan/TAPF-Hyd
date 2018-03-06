@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "606745214795",
+    "firebase_url": "https://tapf-hyd.firebaseio.com",
+    "project_id": "tapf-hyd",
+    "storage_bucket": "tapf-hyd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:606745214795:android:89408723d5b6eb64",
+        "android_client_info": {
+          "package_name": "org.akshayapatra.tapf_hyd"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "606745214795-b60n875aebibjtujtlev823obf3j90e8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.akshayapatra.tapf_hyd",
+            "certificate_hash": "833ca786f9b2de5e7e606f937cd0f38428214559"
+          }
+        },
+        {
+          "client_id": "606745214795-jdhtu7rqaus9d8k49fma0lisjkecojqd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9wNTpauRBoqZiTC6k7E0a8RXnTSC6gds"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "606745214795-jdhtu7rqaus9d8k49fma0lisjkecojqd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

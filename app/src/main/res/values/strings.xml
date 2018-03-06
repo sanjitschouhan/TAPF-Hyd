@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">TAPF-Hyd</string>
+    <string-array name="status_list">
+        <item>All</item>
+        <item>Open</item>
+        <item>Hold</item>
+    </string-array>
+</resources>
