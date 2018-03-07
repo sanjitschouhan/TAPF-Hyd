@@ -3,22 +3,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="10dp"
+    tools:context="org.akshayapatra.tapf_hyd.CompanyGroupActivity">
 
     <TextView
-        android:id="@+id/name"
-        style="@style/Base.TextAppearance.AppCompat.Large"
+        style="@style/Base.TextAppearance.AppCompat.Display1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="Name" />
+        android:text="Select Starting Letter of Company Name"
+        android:textAlignment="center" />
 
-    <TextView
-        android:id="@+id/address"
-        style="@style/Base.TextAppearance.AppCompat.Medium"
+    <GridView
+        android:id="@+id/lv_groups"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="Address" />
-
+        android:numColumns="4"
+        android:textAlignment="center" />
 
 </LinearLayout>

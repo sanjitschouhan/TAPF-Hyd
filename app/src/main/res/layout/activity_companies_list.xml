@@ -14,6 +14,14 @@
         android:hint="@string/search"
         android:singleLine="true" />
 
+    <TextView
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="Loading..."
+        android:textAlignment="center" />
+
     <ListView
         android:id="@+id/lv_company_list"
         android:layout_width="match_parent"

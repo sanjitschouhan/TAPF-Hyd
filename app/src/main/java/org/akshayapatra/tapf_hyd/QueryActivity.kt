@@ -17,7 +17,6 @@ class QueryActivity : AppCompatActivity() {
     var states: ArrayList<String>? = null
     var statesAdapter: ArrayAdapter<String>? = null
     var statesSpinner: Spinner? = null
-    var statusSpinner: Spinner? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,10 +25,9 @@ class QueryActivity : AppCompatActivity() {
         val companies = FirebaseDatabase.getInstance().getReference("/states")
         states = ArrayList()
 
-        statesAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, states);
+        statesAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, states)
 
         statesSpinner = findViewById(R.id.states)
-        statusSpinner = findViewById(R.id.status)
         statesSpinner!!.adapter = statesAdapter
 
         companies.addChildEventListener(object : ChildEventListener {
@@ -60,10 +58,8 @@ class QueryActivity : AppCompatActivity() {
 
     fun showCompanies(view: View) {
         val state = statesSpinner!!.selectedItem.toString()
-        val status = statusSpinner!!.selectedItem.toString()
-        val intent = Intent(this, CompaniesListActivity::class.java)
+        val intent = Intent(this, CompanyGroupActivity::class.java)
         intent.putExtra("state", state)
-        intent.putExtra("status", status)
         startActivity(intent)
     }
 }
