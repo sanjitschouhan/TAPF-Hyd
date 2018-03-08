@@ -9,13 +9,21 @@
     tools:context="org.akshayapatra.tapf_hyd.CompanyGroupActivity">
 
     <TextView
-        style="@style/Base.TextAppearance.AppCompat.Display1"
+        style="@style/Base.TextAppearance.AppCompat.Large"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select Starting Letter of Company Name"
+        android:text="Select Paidup Capital Range"
         android:textAlignment="center" />
 
-    <GridView
+
+    <TextView
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="Loading..." />
+
+    <ListView
         android:id="@+id/lv_groups"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

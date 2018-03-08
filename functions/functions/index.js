@@ -1,85 +1,58 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+let functions = require('firebase-functions');
+let admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
-const gcs = require('@google-cloud/storage')();
-const path = require('path');
-const os = require('os');
-const fs = require('fs');
-const csv = require('csvtojson');
-const request = require('request')
+let gcs = require('@google-cloud/storage')();
+let path = require('path');
+let os = require('os');
+let fs = require('fs');
+let csv = require('csvtojson');
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
+let companiesDB = admin.database().ref("/companies");
+let statesDB = admin.database().ref("/states");
+let bucket = gcs.bucket("gs://tapf-hyd.appspot.com");
 
-exports.clearDatabase = functions.https.onRequest(function (request, response) {
-    response.send("Completed");
-    return admin.database().ref("/companies").remove();
-
-});
+function parseCompanyValues(jsonObj) {
+    jsonObj['PAIDUP_CAPITAL (RS)'] = parseFloat(jsonObj['PAIDUP_CAPITAL (RS)']);
+    return jsonObj;
+}
 
 function generateDB() {
-    const filePath = "companies.csv";
-    const bucket = gcs.bucket("gs://tapf-hyd.appspot.com");
-    const companies = admin.database().ref("/companies");
-    const statesDB = admin.database().ref("/states");
-    const tempFilePath = path.join(os.tmpdir(), filePath);
-    var file = bucket.file(filePath);
-    var states = [];
+    let filePath = "companies.csv";
+    let tempFilePath = path.join(os.tmpdir(), filePath);
+    let file = bucket.file(filePath);
+    let states = {};
+    let companies = {};
     return file.download({
         destination: tempFilePath
-    }).then(function () {
+    }).then(() => {
         return csv()
             .fromFile(tempFilePath)
-            .on("json", function (jsonObj) {
-                if (states.indexOf(jsonObj.REGISTERED_STATE) === -1) {
-                    states.push(jsonObj.REGISTERED_STATE);
-                    statesDB.child(jsonObj.REGISTERED_STATE).set(true);
-                    return companies.child(jsonObj.REGISTERED_STATE)
-                        .remove()
-                        .then(function () {
-                            return companies
-                                .child(jsonObj.REGISTERED_STATE)
-                                .child(jsonObj.CIN)
-                                .set(jsonObj);
-                        })
-                } else {
-                    return companies
-                        .child(jsonObj.REGISTERED_STATE)
-                        .child(jsonObj.CIN)
-                        .set(jsonObj);
+            .on("json", (jsonObj) => {
+                if (states.hasOwnProperty(jsonObj.REGISTERED_STATE)) {
+                    states[jsonObj.REGISTERED_STATE] += 1;
                 }
-            }).on("done", function (error) {
+                else {
+                    states[jsonObj.REGISTERED_STATE] = 1;
+                    companies[jsonObj.REGISTERED_STATE] = {}
+                }
+                companies[jsonObj.REGISTERED_STATE][jsonObj.CIN] = parseCompanyValues(jsonObj);
+            }).on("done", (error) => {
                 fs.unlinkSync(tempFilePath);
+                for (let state in states) {
+                    statesDB.child(state).set(states[state]);
+                    companiesDB.child(state).set(companies[state]);
+                }
             });
     });
 }
 
-exports.generateDatabaseManually = functions.https.onRequest(function (request, response) {
-    response.send("Completed");
-    return generateDB();
+exports.generateDatabaseManually = functions.https.onRequest((request, response) => {
+    return generateDB().then(() => {
+        return response.send("Completed");
+    });
 });
 
-exports.generateDatabase = functions.storage.object().onChange(function (event) {
-    // const filePath = "companies.csv";
-    // const bucket = gcs.bucket("gs://tapf-hyd.appspot.com");
-    // const companies = admin.database().ref("/companies");
-    // const tempFilePath = path.join(os.tmpdir(), filePath);
-    // var file = bucket.file(filePath);
-    // return file.download({
-    //     destination: tempFilePath
-    // }).then(function () {
-    //     return csv()
-    //         .fromFile(tempFilePath)
-    //         .on("json", function (jsonObj) {
-    //             companies
-    //                 .child(jsonObj.REGISTERED_STATE)
-    //                 .child(jsonObj.CIN)
-    //                 .set(jsonObj);
-    //             return "";
-    //         }).on("done", function (error) {
-    //             fs.unlinkSync(tempFilePath);
-    //         });
-    // });
+exports.generateDatabase = functions.storage.object().onChange((event) => {
     return generateDB()
 });
+

@@ -109,22 +109,15 @@ class CompaniesListActivity : AppCompatActivity() {
 
         }
 
-        val group = intent.getIntExtra("group", 0)
+        val group = intent.getStringExtra("group").split("-")
+        val start = group[0].trim().toDouble()
+        val end = group[1].trim().toDouble()
 
-        if (group == 0) {
-            databaseReference
-                    ?.orderByChild("COMPANY_NAME")
-                    ?.startAt("0")
-                    ?.endAt("9" + "\uf8ff")
-                    ?.addChildEventListener(childEventListener)
-        } else {
-            var c = ('A' + group - 1).toString()
-            databaseReference
-                    ?.orderByChild("COMPANY_NAME")
-                    ?.startAt(c)
-                    ?.endAt(c + "\uf8ff")
-                    ?.addChildEventListener(childEventListener)
-        }
+        databaseReference
+                ?.orderByChild("PAIDUP_CAPITAL (RS)")
+                ?.startAt(start)
+                ?.endAt(end)
+                ?.addChildEventListener(childEventListener)
     }
 
     private fun filterCompanies() {
