@@ -18,8 +18,12 @@
         </activity>
         <activity android:name=".QueryActivity" />
         <activity android:name=".CompaniesListActivity" />
-        <activity android:name=".CompanyDetailsActivity" />
-        <activity android:name=".CompanyGroupActivity"></activity>
+        <activity
+            android:name=".CompanyDetailsActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".CompanyGroupActivity"
+            android:label="Select Paidup Capital Range"></activity>
     </application>
 
 </manifest>

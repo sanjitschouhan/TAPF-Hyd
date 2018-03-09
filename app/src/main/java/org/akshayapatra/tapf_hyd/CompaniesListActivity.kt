@@ -3,23 +3,21 @@ package org.akshayapatra.tapf_hyd
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.text.Editable
-import android.text.TextWatcher
-import android.widget.EditText
+import android.support.v7.widget.SearchView
+import android.view.Menu
 import android.widget.ListView
 import com.google.firebase.database.*
 import org.json.JSONObject
 
-class CompaniesListActivity : AppCompatActivity() {
 
+class CompaniesListActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     private var lvCompanyList: ListView? = null
     var alCompanies: ArrayList<JSONObject>? = null
-    var alFilteredCompanies: ArrayList<JSONObject>? = null
-    var adapter: CompanyArrayAdapter? = null
+    private var alFilteredCompanies: ArrayList<JSONObject>? = null
+    private var adapter: CompanyArrayAdapter? = null
 
-    private var etSearch: EditText? = null
-    var databaseReference: DatabaseReference? = null
-    var childEventListener: ChildEventListener? = null
+    private var databaseReference: DatabaseReference? = null
+    private var childEventListener: ChildEventListener? = null
 
     val fieldsToShow = arrayOf("CIN", "COMPANY_NAME", "REGISTERED_OFFICE_ADDRESS")
 
@@ -27,12 +25,13 @@ class CompaniesListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_companies_list)
 
-        etSearch = findViewById(R.id.et_search)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
 
         lvCompanyList = findViewById(R.id.lv_company_list)
         alCompanies = ArrayList()
         alFilteredCompanies = ArrayList()
-        adapter = CompanyArrayAdapter(this, alFilteredCompanies!!)
+        adapter = CompanyArrayAdapter(this, (alFilteredCompanies as List<JSONObject>?)!!)
         lvCompanyList!!.adapter = adapter
 
         lvCompanyList?.emptyView = findViewById(R.id.loading)
@@ -47,22 +46,10 @@ class CompaniesListActivity : AppCompatActivity() {
             startActivityForResult(intent, 0)
         }
 
-        etSearch?.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
-                filterCompanies()
-            }
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
-        })
     }
 
     private fun initDBOperations() {
 
-        val query = etSearch?.text.toString().trim()
         val database = FirebaseDatabase.getInstance()
 
         val statusRef = database.getReference("status")
@@ -98,7 +85,6 @@ class CompaniesListActivity : AppCompatActivity() {
                             override fun onDataChange(p0: DataSnapshot?) {
                                 company.put("STATUS", p0?.getValue(String::class.java))
                                 alCompanies?.add(company)
-//                                adapter?.notifyDataSetChanged()
                                 filterCompanies()
                             }
                         })
@@ -109,9 +95,8 @@ class CompaniesListActivity : AppCompatActivity() {
 
         }
 
-        val group = intent.getStringExtra("group").split("-")
-        val start = group[0].trim().toDouble()
-        val end = group[1].trim().toDouble()
+        val start = intent.getLongExtra("start", 0).toDouble()
+        val end = intent.getLongExtra("end", 0).toDouble()
 
         databaseReference
                 ?.orderByChild("PAIDUP_CAPITAL (RS)")
@@ -120,9 +105,11 @@ class CompaniesListActivity : AppCompatActivity() {
                 ?.addChildEventListener(childEventListener)
     }
 
+    var query: String = ""
+
     private fun filterCompanies() {
         alFilteredCompanies?.clear()
-        val query = etSearch?.text.toString()
+        query = query.trim()
         for (company in alCompanies!!) {
             if (company["COMPANY_NAME"].toString().contains(query, true)) {
                 alFilteredCompanies?.add(company)
@@ -134,5 +121,35 @@ class CompaniesListActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         this.recreate()
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val menuInflater = menuInflater
+        menuInflater.inflate(R.menu.menu_company_list, menu)
+
+        val searchItem = menu?.findItem(R.id.action_search)
+
+        val searchView: SearchView? = searchItem?.actionView as SearchView
+        searchView?.queryHint = "Search Companies"
+        searchView?.setOnQueryTextListener(this)
+
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        this.query = query.toString()
+        filterCompanies()
+        return true
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        this.query = newText.toString()
+        filterCompanies()
+        return true
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return super.onSupportNavigateUp()
     }
 }

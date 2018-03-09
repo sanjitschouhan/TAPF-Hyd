@@ -25,14 +25,15 @@ class CompanyArrayAdapter(context: Context, objects: List<JSONObject>) : ArrayAd
         val company: JSONObject? = getItem(position)
         val companyNameView: TextView? = newView?.findViewById(R.id.name)
         val companyAddressView: TextView? = newView?.findViewById(R.id.address)
+        val indicator: View? = newView?.findViewById(R.id.indicator)
 
         companyNameView?.text = company?.getString("COMPANY_NAME")
         companyAddressView?.text = company?.getString("REGISTERED_OFFICE_ADDRESS")
 
         if (company!!.has("STATUS")) {
-            newView?.setBackgroundColor(Color.RED)
+            indicator?.setBackgroundColor(Color.RED)
         } else {
-            newView?.setBackgroundColor(Color.GREEN)
+            indicator?.setBackgroundColor(Color.GREEN)
         }
 
         return newView!!

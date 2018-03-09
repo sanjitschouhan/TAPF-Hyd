@@ -22,6 +22,10 @@ class CompanyDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_company_details)
 
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+
         lvCompanyDetails = findViewById(R.id.lv_company_details)
 
         FirebaseDatabase.getInstance().getReference("/companies")
@@ -154,5 +158,10 @@ class CompanyDetailsActivity : AppCompatActivity() {
                         }
                     }
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return super.onSupportNavigateUp()
     }
 }

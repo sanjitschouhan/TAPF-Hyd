@@ -3,31 +3,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:orientation="vertical"
-    android:padding="10dp"
     tools:context="org.akshayapatra.tapf_hyd.CompanyGroupActivity">
-
-    <TextView
-        style="@style/Base.TextAppearance.AppCompat.Large"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Select Paidup Capital Range"
-        android:textAlignment="center" />
-
 
     <TextView
         android:id="@+id/loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="Loading..." />
+        android:text="Loading..."
+        android:visibility="gone" />
 
     <ListView
         android:id="@+id/lv_groups"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:numColumns="4"
-        android:textAlignment="center" />
+        android:textAlignment="center"
+        tools:listitem="@layout/item_company_group" />
 
 </LinearLayout>

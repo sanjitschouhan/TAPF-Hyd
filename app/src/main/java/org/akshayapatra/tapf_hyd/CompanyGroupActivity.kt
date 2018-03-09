@@ -3,31 +3,30 @@ package org.akshayapatra.tapf_hyd
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.widget.ArrayAdapter
 import android.widget.ListView
 import com.google.firebase.database.*
 
 class CompanyGroupActivity : AppCompatActivity() {
 
     var lvGroups: ListView? = null
-    var alGroups: ArrayList<String>? = null
-    var adapter: ArrayAdapter<String>? = null
+    var alGroups: ArrayList<CompanyGroupItem>? = null
+    var adapter: CompanyGroupAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_company_group)
         lvGroups = findViewById(R.id.lv_groups)
         alGroups = ArrayList()
-        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, alGroups)
+        adapter = CompanyGroupAdapter(this, alGroups!!)
         lvGroups?.adapter = adapter
         lvGroups?.emptyView = findViewById(R.id.loading)
 
         lvGroups?.setOnItemClickListener { adapterView, view, i, l ->
             val intent = Intent(this, CompaniesListActivity::class.java)
             intent.putExtras(getIntent().extras)
-            var group = alGroups!![i]
-            group = group.split("(")[0]
-            intent.putExtra("group", group)
+            val group = alGroups!![i]
+            intent.putExtra("start", group.rangeStart)
+            intent.putExtra("end", group.rangeEnd)
             startActivity(intent)
         }
 
@@ -96,22 +95,18 @@ class CompanyGroupActivity : AppCompatActivity() {
         alGroups!!.clear()
         var rangeStart = 0L
         var rangeEnd = 0L
-        var count = 0
-        val format = "%15d\t- %-15d (%3d)"
+        var count = 0L
         for (key in mapRanges.keys.sorted()) {
             if (count + mapRanges[key]!! > 100) {
-//                Log.d("Ranges", rangeStart.toString() + "-" + rangeEnd.toString() + "=" + count)
-                alGroups!!.add(format.format(rangeStart, rangeEnd, count))
+                alGroups!!.add(CompanyGroupItem(rangeStart, rangeEnd, count))
                 rangeStart = key
                 count = 0
             }
             rangeEnd = key
             count += mapRanges[key]!!
         }
-//        Log.d("Ranges", rangeStart.toString() + "-" + rangeEnd.toString() + "=" + count)
-        alGroups!!.add(format.format(rangeStart, rangeEnd, count))
+        alGroups!!.add(CompanyGroupItem(rangeStart, rangeEnd, count))
         adapter!!.notifyDataSetChanged()
     }
-
 
 }
